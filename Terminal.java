@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.Scanner;
+
 class Terminal {
     Parser parser;
     File currentPath = new File(System.getProperty("user.dir"));
@@ -14,9 +13,7 @@ class Terminal {
     }
     public void cd(String[] args){
         if(args.length==0){
-            String pathOfUser;
             currentPath = new File(System.getProperty("user.home"));
-            pathOfUser = (System.getProperty("user.home"));
         }else if(args.length==1 && args[0].equals("..")){
             currentPath = currentPath.getParentFile();
         }else {
@@ -25,7 +22,7 @@ class Terminal {
         }
     }
 
-    public String ls(String [] args){
+    public String ls(){
         String [] content = currentPath.list();
         StringBuilder text = new StringBuilder();
         for (int i = 0; i < content.length; i++)
@@ -57,7 +54,7 @@ class Terminal {
                 break;
 
             case "ls":
-                System.out.println(ls(args));
+                System.out.println(ls());
                 break;
 
             default:
