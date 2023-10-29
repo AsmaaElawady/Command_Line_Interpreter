@@ -8,19 +8,19 @@ public class CommendLine {
         String command;
         String[] Args;
         String Input;
-        boolean flag = true ;
+        boolean flag = true;
         Scanner input = new Scanner(System.in);
-        while (flag){
+        while (flag) {
             System.out.print(">");
             Input = input.nextLine();
-            if (Input.equals("exit")){
-                flag = false ;
-                break ;
+            if (Input.equals("exit")) {
+                flag = false;
+                break;
             }
-            if(parser.parse(Input) ) {
+            if (parser.parse(Input)) {
                 command = parser.getCommandName();
                 Args = parser.getArgs();
-                terminal.chooseCommandAction(command ,Args);
+                terminal.chooseCommandAction(command, Args);
             }
         }
     }
