@@ -108,6 +108,102 @@ class Terminal {
         }
     }
 
+    public void touch(String[] args) {
+        for (String arg : args) {
+            File newFile = new File(arg);
+
+            if (!newFile.exists()) {
+                try {
+                    if (newFile.createNewFile()) {
+                        System.out.println("File Created: " + newFile.getAbsolutePath());
+                    } else {
+                        System.err.println("Failed to create file: " + newFile.getAbsolutePath());
+                    }
+                } catch (IOException e) {
+                    System.err.println("Error creating file: " + e.getMessage());
+                }
+            } else {
+                System.err.println("File already exists: " + newFile.getAbsolutePath());
+            }
+        }
+    }
+    public void cp(String[] args) {
+        if (args.length != 2) {
+            System.err.println("Usage: cp <source> <destination>");
+            return;
+        }
+
+        String sourcePath = args[0];
+        String destinationPath = args[1];
+
+        File sourceFile = new File(sourcePath);
+        File destinationFile = new File(destinationPath);
+
+        if (!sourceFile.exists() || !sourceFile.isFile()) {
+            System.err.println("Source file does not exist or is not a valid file: " + sourcePath);
+            return;
+        }
+        if (destinationFile.exists() && destinationFile.isDirectory()) {
+            // If the destination is a directory, create a new file inside the directory
+            destinationFile = new File(destinationFile, sourceFile.getName());
+        }
+
+        try (InputStream inputStream = new FileInputStream(sourceFile);
+             OutputStream outputStream = new FileOutputStream(destinationFile)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            System.out.println("File copied from " + sourcePath + " to " + destinationPath);
+        } catch (IOException e) {
+            System.err.println("Error copying file: " + e.getMessage());
+        }
+    }
+     public void cpR(String[] args) {
+        if (args.length != 2) {
+            System.err.println("Usage: cp-r <source> <destination>");
+            return;
+        }
+
+        String sourcePath = args[0];
+        String destinationPath = args[1];
+
+        File source = new File(sourcePath);
+        File destination = new File(destinationPath);
+
+        if (!source.exists()) {
+            System.err.println("Source does not exist: " + sourcePath);
+            return;
+        }
+
+        try {
+            if (source.isDirectory()) {
+                // If the source is a directory, copy it and its contents recursively
+                copyDirectory(source.toPath(), destination.toPath());
+                System.out.println("Directory copied from " + sourcePath + " to " + destinationPath);
+            } else if (source.isFile()) {
+                // If the source is a file, simply copy it to the destination
+                Files.copy(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("File copied from " + sourcePath + " to " + destinationPath);
+            }
+        } catch (IOException e) {
+            System.err.println("Error copying: " + e.getMessage());
+        }
+    }
+     private void copyDirectory(Path source, Path destination) throws IOException {
+        Files.walk(source)
+             .forEach(sourcePath -> {
+                 Path targetPath = destination.resolve(source.relativize(sourcePath));
+                 try {
+                     Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                 } catch (IOException e) {
+                     System.err.println("Error copying directory: " + e.getMessage());
+                 }
+             });
+    }
+
+
     private void removeEmptyDirectories(File dir) {
         LinkedList<File> directories = new LinkedList<>();
         // push the initial directory.
@@ -169,6 +265,18 @@ class Terminal {
 
             case "rmdir":
                 rmdir(args);
+                break;
+                
+            case "touch":
+                touch(args);
+                break;
+
+            case "cp":
+                cp(args);
+                break;
+
+            case "cp-r":
+                cpR(args);
                 break;
 
             default:
