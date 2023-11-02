@@ -1,6 +1,20 @@
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Scanner;
+
+
+
 
 class Terminal {
     Parser parser;
@@ -191,6 +205,155 @@ class Terminal {
             System.err.println("Error copying: " + e.getMessage());
         }
     }
+
+        // CL to remove file from the current directory
+    public void rm(String[] args){
+            if (args.length == 1) {
+                
+                Path filePath = Paths.get(args[0]);
+                File toDelFile  = new File(filePath.toString());
+
+                if (toDelFile.exists()) {
+                     toDelFile.delete();
+                }else{
+                    System.err.format("%s: no such" + " file or directory%n", filePath);
+
+                }
+            }
+            else{
+                System.out.println("Error: there's more than file name");
+            }
+        }
+
+
+        // Cl to prints the file contents or the two files content
+        public void cat(String[] args) {
+
+            if (args.length == 1) {
+
+                String fileName = args[0];
+                Path filePath = Paths.get(fileName);
+                File toDelFile = new File(filePath.toString());
+
+                if (toDelFile.exists()) {
+                    Scanner sc2 = null;
+                    try {
+                        sc2 = new Scanner(new File(fileName));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    while (sc2.hasNextLine()) {
+                        Scanner lineScan = new Scanner(sc2.nextLine());
+
+                        while (lineScan.hasNext()) {
+                            System.out.print(lineScan.next() + ' ');
+                        }
+                        System.out.println();
+                    }
+                } else {
+                    System.err.format("%s: no such" + " file or directory%n", filePath);
+
+                }
+            } else if (args.length == 2) {
+
+                String fileName2 = args[1];
+                Path filePath2 = Paths.get(fileName2);
+                File toDelFile2 = new File(filePath2.toString());
+                String fileName = args[0];
+                Path filePath = Paths.get(fileName);
+                File toDelFile = new File(filePath.toString());
+
+                if (toDelFile.exists() && toDelFile2.exists()) {
+                    Scanner sc2 = null;
+                    try {
+                        sc2 = new Scanner(new File(fileName));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    while (sc2.hasNextLine()) {
+                        Scanner lineScan = new Scanner(sc2.nextLine());
+
+                        while (lineScan.hasNext()) {
+                            System.out.print(lineScan.next() + ' ');
+                        }
+                        System.out.println();
+                    }
+
+                    try {
+                        sc2 = new Scanner(new File(fileName2));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    while (sc2.hasNextLine()) {
+                        Scanner lineScan = new Scanner(sc2.nextLine());
+
+                        while (lineScan.hasNext()) {
+                            System.out.print(lineScan.next() + ' ');
+                        }
+                        System.out.println();
+                    }
+
+                } else {
+                    System.err.format("%s: no such" + " file or directory%n", filePath);
+
+                }
+
+            } else {
+                System.out.println("s: not Valid arguments" + " ,two or one argu");
+            }
+
+        }
+
+        // Cl to count # words , lines , characters
+        public void wc(String[] args) {
+
+            if (args.length == 1) {
+                String fileName = args[0];
+                Path filePath = Paths.get(args[0]);
+                File file = new File(filePath.toString());
+
+                if (file.exists()) {
+                    int words = 0, lines = 0, chars = 0;
+
+                    Scanner fScan = null;
+                    try {
+                        fScan = new Scanner(new File(fileName));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    while (fScan.hasNextLine()) {
+                        lines++;
+                        Scanner lineSc = new Scanner(fScan.nextLine());
+
+                        while (lineSc.hasNext()) {
+                            words++;
+                            String w = lineSc.next();
+                            for (int i = 0; i < w.length(); i++) {
+                                chars++;
+                            }
+                        }
+                    }
+
+                    System.out.println(lines + " " + words + ' ' + chars + ' ' + fileName);
+
+                } else {
+                    System.err.format("%s: no such" + " file or directory%n", filePath.toString());
+
+                }
+
+            } else {
+                System.err.format("%s: invalid arguments%n");
+
+            }
+        }
+
+
+
+        //secondry functions
      private void copyDirectory(Path source, Path destination) throws IOException {
         Files.walk(source)
              .forEach(sourcePath -> {
@@ -279,8 +442,24 @@ class Terminal {
                 cpR(args);
                 break;
 
+            case "rm":
+                rm(args);
+                break;
+
+            case "cat":
+                cat(args);
+                break;    
+
+            case "wc":
+                wc(args);
+                break;    
+
             default:
+                System.out.println("s:Error this command doesn't exist");
                 break;
         }
+
+    
     }
+
 }
