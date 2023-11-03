@@ -9,6 +9,8 @@ public class CommendLine {
         String[] Args;
         String Input;
         boolean flag = true;
+
+        
         Scanner input = new Scanner(System.in);
         while (flag) {
             System.out.print(">");

@@ -263,135 +263,94 @@ class CLI {
         }
 
         // remove file from the current directory
-        public void rm(String[] args) {
+         // CL to remove file from the current directory
+    public void rm(String[] args){
             if (args.length == 1) {
+                
+                
+                Path filePath = Paths.get(currentPath.toString(),args[0]);
+                File toDelFile  = new File(filePath.toString());
 
-                Path filePath = Paths.get(args[0]);
-                File toDelFile = new File(filePath.toString());
+                
 
                 if (toDelFile.exists()) {
-                    toDelFile.delete();
-                } else {
+                     toDelFile.delete();
+                }else{
                     System.err.format("%s: no such" + " file or directory%n", filePath);
 
                 }
-            } else {
+            }
+            else{
                 System.out.println("Error: there's more than file name");
             }
         }
 
+
         // Cl to prints the file contents or the two files content
-        public void cat(String[] args) {
 
-            if (args.length == 1) {
+        public void cat(String[] args){
 
-                String fileName = args[0];
-                Path filePath = Paths.get(fileName);
-                File toDelFile = new File(filePath.toString());
+            if (args.length == 1 || args.length == 2) {
 
-                if (toDelFile.exists()) {
-                    Scanner sc2 = null;
-                    try {
-                        sc2 = new Scanner(new File(fileName));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                for(int i = 0 ; i < args.length ;i++){
 
-                    while (sc2.hasNextLine()) {
-                        Scanner lineScan = new Scanner(sc2.nextLine());
+                    String fileName = args[i];
+                    Path filePath = Paths.get(currentPath.toString(), args[i]);
+                    File file = new File(filePath.toString());
 
-                        while (lineScan.hasNext()) {
-                            System.out.print(lineScan.next() + ' ');
+                    if (file.exists()) {
+                        
+                        try(Scanner fileSc = new Scanner(file)){
+                            while (fileSc.hasNextLine()) {
+                                System.out.println(fileSc.nextLine());
+                            }
+
+                        }catch(FileNotFoundException e){
+                            e.printStackTrace();
                         }
-                        System.out.println();
+
+                    }else{
+                        System.err.format("%s: no such" + " file or directory%n", filePath);
                     }
-                } else {
-                    System.err.format("%s: no such" + " file or directory%n", filePath);
+
 
                 }
-            } else if (args.length == 2) {
-
-                String fileName2 = args[1];
-                Path filePath2 = Paths.get(fileName2);
-                File toDelFile2 = new File(filePath2.toString());
-                String fileName = args[0];
-                Path filePath = Paths.get(fileName);
-                File toDelFile = new File(filePath.toString());
-
-                if (toDelFile.exists() && toDelFile2.exists()) {
-                    Scanner sc2 = null;
-                    try {
-                        sc2 = new Scanner(new File(fileName));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                    while (sc2.hasNextLine()) {
-                        Scanner lineScan = new Scanner(sc2.nextLine());
-
-                        while (lineScan.hasNext()) {
-                            System.out.print(lineScan.next() + ' ');
-                        }
-                        System.out.println();
-                    }
-
-                    try {
-                        sc2 = new Scanner(new File(fileName2));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                    while (sc2.hasNextLine()) {
-                        Scanner lineScan = new Scanner(sc2.nextLine());
-
-                        while (lineScan.hasNext()) {
-                            System.out.print(lineScan.next() + ' ');
-                        }
-                        System.out.println();
-                    }
-
-                } else {
-                    System.err.format("%s: no such" + " file or directory%n", filePath);
-
-                }
-
-            } else {
-                System.out.println("s: not Valid arguments" + " ,two or one argu");
+            }else {
+                System.err.println("Error: invalid arguments. One or two arguments expected.");
             }
-
         }
 
+        
         // Cl to count # words , lines , characters
         public void wc(String[] args) {
 
             if (args.length == 1) {
+
                 String fileName = args[0];
-                Path filePath = Paths.get(args[0]);
+                Path filePath = Paths.get(currentPath.toString(), args[0]);
                 File file = new File(filePath.toString());
 
                 if (file.exists()) {
                     int words = 0, lines = 0, chars = 0;
 
-                    Scanner fScan = null;
-                    try {
-                        fScan = new Scanner(new File(fileName));
+                    try (Scanner fScan = new Scanner(file)) {
+
+                        while (fScan.hasNextLine()) {
+                            lines++;
+                            Scanner lineSc = new Scanner(fScan.nextLine());
+
+                            while (lineSc.hasNext()) {
+                                words++;
+                                String w = lineSc.next();
+                                chars += w.length();
+                            }
+                            lineSc.close();
+                        }
+
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
+
                     }
-
-                    while (fScan.hasNextLine()) {
-                        lines++;
-                        Scanner lineSc = new Scanner(fScan.nextLine());
-
-                        while (lineSc.hasNext()) {
-                            words++;
-                            String w = lineSc.next();
-                            for (int i = 0; i < w.length(); i++) {
-                                chars++;
-                            }
-                        }
-                    }
-
                     System.out.println(lines + " " + words + ' ' + chars + ' ' + fileName);
 
                 } else {
@@ -400,7 +359,7 @@ class CLI {
                 }
 
             } else {
-                System.err.format("%s: invalid arguments%n");
+                System.out.println(" invalid arguments%n");
 
             }
         }
