@@ -1,3 +1,4 @@
+
 //this file contains the two major classes for the CLI program
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +18,6 @@ import java.util.Scanner;
 class CLI {
 
     // this is the parser Class ******************************************
-
     static public class Parser {
         String commandName;
         String[] args;
@@ -51,16 +51,12 @@ class CLI {
         }
     }
 
-
-
-    // this is the Terminal Class ******************************************
-
+    // this is the Terminal Class
     static public class Terminal {
         Parser parser;
         File currentPath = new File(System.getProperty("user.dir"));
 
         // Commands implementaion
-        /*****************************************/
         public String echo(String[] args) {
             return String.join(" ", args);
         }
@@ -218,7 +214,7 @@ class CLI {
             }
 
             try (InputStream inputStream = new FileInputStream(sourceFile);
-                 OutputStream outputStream = new FileOutputStream(destinationFile)) {
+                    OutputStream outputStream = new FileOutputStream(destinationFile)) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -231,13 +227,13 @@ class CLI {
         }
 
         public void cpR(String[] args) {
-            if (args.length != 2) {
+            if (args.length != 3) {
                 System.err.println("Usage: cp -r <source> <destination>");
                 return;
             }
 
-            String sourcePath = args[0];
-            String destinationPath = args[1];
+            String sourcePath = args[1];
+            String destinationPath = args[2];
 
             File source = new File(sourcePath);
             File destination = new File(destinationPath);
@@ -263,69 +259,53 @@ class CLI {
         }
 
         // remove file from the current directory
-         // CL to remove file from the current directory
-    public void rm(String[] args){
+        // CL to remove file from the current directory
+        public void rm(String[] args) {
             if (args.length == 1) {
-                
-                
-                Path filePath = Paths.get(currentPath.toString(),args[0]);
-                File toDelFile  = new File(filePath.toString());
 
-                
+                Path filePath = Paths.get(currentPath.toString(), args[0]);
+                File toDelFile = new File(filePath.toString());
 
                 if (toDelFile.exists()) {
-                     toDelFile.delete();
-                }else{
+                    toDelFile.delete();
+                } else {
                     System.err.format("%s: no such" + " file or directory%n", filePath);
 
                 }
-            }
-            else{
+            } else {
                 System.out.println("Error: there's more than file name");
             }
         }
 
-
         // Cl to prints the file contents or the two files content
-
-        public void cat(String[] args){
-
+        public void cat(String[] args) {
             if (args.length == 1 || args.length == 2) {
-
-                for(int i = 0 ; i < args.length ;i++){
+                for (int i = 0; i < args.length; i++) {
 
                     String fileName = args[i];
                     Path filePath = Paths.get(currentPath.toString(), args[i]);
                     File file = new File(filePath.toString());
 
                     if (file.exists()) {
-                        
-                        try(Scanner fileSc = new Scanner(file)){
+                        try (Scanner fileSc = new Scanner(file)) {
                             while (fileSc.hasNextLine()) {
                                 System.out.println(fileSc.nextLine());
                             }
-
-                        }catch(FileNotFoundException e){
+                        } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
-
-                    }else{
+                    } else {
                         System.err.format("%s: no such" + " file or directory%n", filePath);
                     }
-
-
                 }
-            }else {
+            } else {
                 System.err.println("Error: invalid arguments. One or two arguments expected.");
             }
         }
 
-        
         // Cl to count # words , lines , characters
         public void wc(String[] args) {
-
             if (args.length == 1) {
-
                 String fileName = args[0];
                 Path filePath = Paths.get(currentPath.toString(), args[0]);
                 File file = new File(filePath.toString());
@@ -334,7 +314,6 @@ class CLI {
                     int words = 0, lines = 0, chars = 0;
 
                     try (Scanner fScan = new Scanner(file)) {
-
                         while (fScan.hasNextLine()) {
                             lines++;
                             Scanner lineSc = new Scanner(fScan.nextLine());
@@ -346,18 +325,13 @@ class CLI {
                             }
                             lineSc.close();
                         }
-
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
-
                     }
                     System.out.println(lines + " " + words + ' ' + chars + ' ' + fileName);
-
                 } else {
                     System.err.format("%s: no such" + " file or directory%n", filePath.toString());
-
                 }
-
             } else {
                 System.out.println(" invalid arguments%n");
 
@@ -371,8 +345,9 @@ class CLI {
                         Path targetPath = destination.resolve(source.relativize(sourcePath));
                         try {
                             Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) { }
-                        
+                        } catch (IOException e) {
+                        }
+
                     });
         }
 
@@ -407,8 +382,9 @@ class CLI {
         private boolean isDirectoryEmpty(File dir) {
             return dir.listFiles() == null || dir.listFiles().length == 0;
         }
+
         // This method will choose the suitable command method to be called
-        public void chooseCommandAction(String command, String[] args)throws IOException {
+        public void chooseCommandAction(String command, String[] args) throws IOException {
             switch (command) {
                 case "echo":
                     System.out.println(echo(args));
@@ -466,33 +442,30 @@ class CLI {
                     System.out.println("s:Error this command doesn't exist");
                     break;
             }
-
         }
-
     }
 
-
-     public static void main(String[] args) throws IOException  {
-         Parser parser = new Parser();
-         Terminal terminal = new Terminal();
-         String command;
-         String[] Args;
-         String Input;
-         boolean flag = true;
-         Scanner input = new Scanner(System.in);
-         while (flag) {
-             System.out.print(">");
-             Input = input.nextLine();
-             if (Input.equals("exit")) {
-                 flag = false;
-                 break;
-             }
-             if (parser.parse(Input)) {
-                 command = parser.getCommandName();
-                 Args = parser.getArgs();
-                 terminal.chooseCommandAction(command, Args);
-             }
-         }
-     }
+    public static void main(String[] args) throws IOException {
+        Parser parser = new Parser();
+        Terminal terminal = new Terminal();
+        String command;
+        String[] Args;
+        String Input;
+        boolean flag = true;
+        Scanner input = new Scanner(System.in);
+        while (flag) {
+            System.out.print(">");
+            Input = input.nextLine();
+            if (Input.equals("exit")) {
+                flag = false;
+                break;
+            }
+            if (parser.parse(Input)) {
+                command = parser.getCommandName();
+                Args = parser.getArgs();
+                terminal.chooseCommandAction(command, Args);
+            }
+        }
+    }
 
 }
