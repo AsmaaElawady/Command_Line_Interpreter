@@ -232,7 +232,7 @@ class CLI {
 
         public void cpR(String[] args) {
             if (args.length != 2) {
-                System.err.println("Usage: cp-r <source> <destination>");
+                System.err.println("Usage: cp -r <source> <destination>");
                 return;
             }
 
@@ -371,9 +371,8 @@ class CLI {
                         Path targetPath = destination.resolve(source.relativize(sourcePath));
                         try {
                             Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            System.err.println("Error copying directory: " + e.getMessage());
-                        }
+                        } catch (IOException e) { }
+                        
                     });
         }
 
