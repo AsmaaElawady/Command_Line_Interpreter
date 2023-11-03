@@ -446,7 +446,7 @@ class CLI {
                     cp(args);
                     break;
 
-                case "cp-r":
+                case "cp -r":
                     cpR(args);
                     break;
 
