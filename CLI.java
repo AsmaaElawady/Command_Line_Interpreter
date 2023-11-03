@@ -1,5 +1,3 @@
-
-// IMPORTANT --> change the file name to CLI.java 
 //this file contains the two major classes for the CLI program
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -21,7 +18,7 @@ class CLI {
 
     // this is the parser Class ******************************************
 
-    public class Parser {
+    static public class Parser {
         String commandName;
         String[] args;
 
@@ -58,7 +55,7 @@ class CLI {
 
     // this is the Terminal Class ******************************************
 
-    public class Terminal {
+    static public class Terminal {
         Parser parser;
         File currentPath = new File(System.getProperty("user.dir"));
 
@@ -73,13 +70,26 @@ class CLI {
         }
 
         public void cd(String[] args) {
-            if (args.length == 0) {
-                currentPath = new File(System.getProperty("user.home"));
-            } else if (args.length == 1 && args[0].equals("..")) {
-                currentPath = currentPath.getParentFile();
-            } else {
-                File file = new File(args[0]);
-                currentPath = file.getAbsoluteFile();
+            try {
+                if (args.length == 0) {
+                    currentPath = new File(System.getProperty("user.home"));
+                } else if (args.length == 1 && args[0].equals("..")) {
+                    File parent = currentPath.getParentFile();
+                    if (parent != null && parent.exists() && parent.isDirectory()) {
+                        currentPath = parent;
+                    } else {
+                        System.out.println("Cannot navigate to the parent directory.");
+                    }
+                } else {
+                    File file = new File(args[0]);
+                    if (file.exists() && file.isDirectory()) {
+                        currentPath = file.getAbsoluteFile();
+                    } else {
+                        System.out.println("Invalid directory path.");
+                    }
+                }
+            } catch (SecurityException e) {
+                System.out.println("Access to the directory is denied.");
             }
         }
 
@@ -208,7 +218,7 @@ class CLI {
             }
 
             try (InputStream inputStream = new FileInputStream(sourceFile);
-                    OutputStream outputStream = new FileOutputStream(destinationFile)) {
+                 OutputStream outputStream = new FileOutputStream(destinationFile)) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -504,27 +514,27 @@ class CLI {
     }
 
 
-    // public static void main(String[] args) throws IOException  {
-    //     Parser parser = new Parser();
-    //     Terminal terminal = new Terminal();
-    //     String command;
-    //     String[] Args;
-    //     String Input;
-    //     boolean flag = true;
-    //     Scanner input = new Scanner(System.in);
-    //     while (flag) {
-    //         System.out.print(">");
-    //         Input = input.nextLine();
-    //         if (Input.equals("exit")) {
-    //             flag = false;
-    //             break;
-    //         }
-    //         if (parser.parse(Input)) {
-    //             command = parser.getCommandName();
-    //             Args = parser.getArgs();
-    //             terminal.chooseCommandAction(command, Args);
-    //         }
-    //     }
-    // }
+     public static void main(String[] args) throws IOException  {
+         Parser parser = new Parser();
+         Terminal terminal = new Terminal();
+         String command;
+         String[] Args;
+         String Input;
+         boolean flag = true;
+         Scanner input = new Scanner(System.in);
+         while (flag) {
+             System.out.print(">");
+             Input = input.nextLine();
+             if (Input.equals("exit")) {
+                 flag = false;
+                 break;
+             }
+             if (parser.parse(Input)) {
+                 command = parser.getCommandName();
+                 Args = parser.getArgs();
+                 terminal.chooseCommandAction(command, Args);
+             }
+         }
+     }
 
 }
